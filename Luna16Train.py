@@ -41,9 +41,6 @@ def main(args):
     patient_ids = list(set(annotations["seriesuid"]))
     size = 128
 
-    # fixme
-    patient_ids = patient_ids[:50]
-
     lungs, masks = load_images(patient_ids, directory, size=128, k=k)
 
     print(lungs.shape)
