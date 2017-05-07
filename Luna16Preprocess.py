@@ -1,5 +1,6 @@
 import SimpleITK
 import numpy as np
+import os
 from pandas.core.frame import DataFrame
 from scipy.ndimage.interpolation import zoom
 
@@ -106,7 +107,19 @@ def resample(img: np.ndarray, spacing: np.ndarray) -> (np.ndarray, np.ndarray):
 
 
 def images_and_nodules(patient_id: str, annotations: DataFrame, image_dir: str) -> (np.ndarray, np.ndarray):
-    img, origin, spacing = load_itk("{}/{}.mhd".format(image_dir, patient_id))
+    """
+    extract images from mhd/raw images and create nodule masks from the annotations
+    :param patient_id: unique id which is called seriesuid
+    :param annotations: nodule annotation DataFrame
+    :param image_dir: directory which has CT scan images
+    :return: 3D image array and mask of nodules
+    """
+
+    mhd_filepath = "{}/{}.mhd".format(image_dir, patient_id)
+    if not os.path.exists(mhd_filepath):
+        return None
+
+    img, origin, spacing = load_itk(mhd_filepath)
     candidates = annotations[annotations["seriesuid"] == patient_id]
 
     lung_img, new_spacing = resample(img, spacing)
