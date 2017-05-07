@@ -3,14 +3,13 @@ import multiprocessing as mp
 import time
 import traceback
 
-import pandas
 import pandas as pd
 from tqdm import tqdm
 
 from Luna16PreprocessUtils import images_and_nodules
 
 
-def load_and_dump(patient_id: str, directory: str, annotations: pandas.DataFrame) -> bool:
+def load_and_dump(patient_id: str, directory: str, annotations: pd.DataFrame) -> bool:
     # noinspection PyBroadException
     try:
         images_nodules = images_and_nodules(patient_id, annotations, directory)
