@@ -1,4 +1,5 @@
 import argparse
+import traceback
 
 import pandas as pd
 from tqdm import tqdm
@@ -17,13 +18,18 @@ def main(args) -> None:
 
     patient_ids = list(set(annotations["seriesuid"]))
     for patient_id in tqdm(patient_ids):
-        images_nodules = images_and_nodules(patient_id, annotations, directory)
-        if not images_nodules:
-            continue
+        # noinspection PyBroadException
+        try:
+            images_nodules = images_and_nodules(patient_id, annotations, directory)
+            if not images_nodules:
+                continue
 
-        lung_img, nodule_mask = images_nodules
-        lung_img.dump("{}/{}_lung_img.npz".format(directory, patient_id))
-        nodule_mask.dump("{}/{}_nodule_mask.npz".format(directory, patient_id))
+            lung_img, nodule_mask = images_nodules
+            lung_img.dump("{}/{}_lung_img.npz".format(directory, patient_id))
+            nodule_mask.dump("{}/{}_nodule_mask.npz".format(directory, patient_id))
+        except Exception:
+            traceback.print_exc()
+            print(patient_id)
 
 
 if __name__ == '__main__':
