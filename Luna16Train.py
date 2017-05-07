@@ -41,6 +41,9 @@ def main(args):
     patient_ids = list(set(annotations["seriesuid"]))
     size = 128
 
+    # fixme
+    patient_ids = patient_ids[:20]
+
     lungs, masks = load_images(patient_ids, directory, size=128, k=k)
 
     print(lungs.shape)
@@ -49,7 +52,7 @@ def main(args):
 
     model = UNet.get_unet(size, size)
     model_checkpoint = ModelCheckpoint('{}/weights.h5'.format(output), monitor='val_loss', save_best_only=True)
-    model.fit(lungs, masks, batch_size=32, nb_epoch=20, verbose=1, shuffle=True, validation_split=0.2,
+    model.fit(lungs, masks, batch_size=32, epochs=20, verbose=1, shuffle=True, validation_split=0.2,
               callbacks=[model_checkpoint])
 
 

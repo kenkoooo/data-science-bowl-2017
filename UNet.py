@@ -19,7 +19,7 @@ def dice_coef_loss(y_true, y_pred):
 
 
 def get_unet(img_rows: int, img_cols: int):
-    inputs = Input((img_rows, img_cols, 1))
+    inputs = Input(shape=(img_rows, img_cols))
     conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
     conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
