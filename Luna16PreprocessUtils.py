@@ -81,10 +81,10 @@ def draw_circles(image: np.ndarray, candidates: DataFrame, origin: np.ndarray, s
                     world_coordinates = np.array((coord_z + z, coord_y + y, coord_x + x))
                     coordinates = world_2_voxel(world_coordinates, origin, spacing)
                     if (np.linalg.norm(image_coord - coordinates) * resize_spacing[0]) < radius:
-                        rx = np.round(coordinates[0])
-                        ry = np.round(coordinates[1])
-                        rz = np.round(coordinates[2])
-                        print(rx, ry, rz)
+                        rx = int(np.round(coordinates[0]))
+                        ry = int(np.round(coordinates[1]))
+                        rz = int(np.round(coordinates[2]))
+
                         image_mask[rx, ry, rz] = int(1)
     return image_mask
 
