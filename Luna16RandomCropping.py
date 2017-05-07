@@ -1,8 +1,14 @@
+import argparse
+import multiprocessing as mp
 import random
+import traceback
 
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
 
 random.seed(71)
+np.random.seed(71)
 
 
 def load_numpy_array(patient_id: str, directory: str) -> (np.ndarray, np.ndarray):
@@ -47,3 +53,49 @@ def cropped_list(img: np.ndarray, mask: np.ndarray, *, size: int, num: int, axis
         mask_list.append(crop(mask, idx=idx, h_edge=h, w_edge=w, size=size))
 
     return np.array(img_list), np.array(mask_list)
+
+
+def single_task(args) -> None:
+    patient_id, directory = args
+
+    size = 128
+    num = 2000
+    # noinspection PyBroadException
+    try:
+        lung_img, nodule_mask = load_numpy_array(patient_id, directory)
+        lung_x, nodule_x = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="x")
+        lung_y, nodule_y = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="y")
+        lung_z, nodule_z = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="z")
+
+        lung_resample = np.concatenate((lung_x, lung_y, lung_z))
+        np.random.shuffle(lung_resample)
+        lung_resample.dump("{}/{}_lung_cropped_{}.npz".format(directory, patient_id, size))
+
+        nodule_resample = np.concatenate((nodule_x, nodule_y, nodule_z))
+        np.random.shuffle(nodule_resample)
+        nodule_resample.dump("{}/{}_nodule_cropped_{}.npz".format(directory, patient_id, size))
+    except Exception:
+        traceback.print_exc()
+        print(patient_id)
+
+
+def main(args) -> None:
+    pool = mp.Pool(4)
+
+    annotations = pd.read_csv(args.a)
+    directory = args.d
+
+    patient_ids = list(set(annotations["seriesuid"]))
+    args_list = [(patient_id, directory) for patient_id in patient_ids]
+    progress_bar = tqdm(total=len(args_list))
+
+    for _ in pool.imap_unordered(single_task, args_list):
+        progress_bar.update(1)
+    progress_bar.close()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", type=str, help="annotation csv file")
+    parser.add_argument("-d", type=str, help="image directory")
+    main(parser.parse_args())
