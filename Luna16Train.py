@@ -28,7 +28,7 @@ def main(args):
 
         lung_array = np.load(lung_path)
         mask_array = np.load(mask_path)
-        sample_list = random.sample(range(lung_array), k=k)
+        sample_list = random.sample(range(len(lung_array)), k=k)
 
         lungs.append(sample(lung_array, sample_list))
         masks.append(sample(mask_array, sample_list))
