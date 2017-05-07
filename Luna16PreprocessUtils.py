@@ -84,6 +84,7 @@ def draw_circles(image: np.ndarray, candidates: DataFrame, origin: np.ndarray, s
                         rx = np.round(coordinates[0])
                         ry = np.round(coordinates[1])
                         rz = np.round(coordinates[2])
+                        print(rx, ry, rz)
                         image_mask[rx, ry, rz] = int(1)
     return image_mask
 
