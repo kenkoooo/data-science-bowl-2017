@@ -26,8 +26,8 @@ def load_images(patient_ids: list, directory: str, *, size, k) -> (np.ndarray, n
         mask_array = np.load(mask_path)
         sample_list = random.sample(range(len(lung_array)), k=k)
 
-        lungs.append(sample(lung_array, sample_list))
-        masks.append(sample(mask_array, sample_list))
+        lungs.extend(sample(lung_array, sample_list))
+        masks.extend(sample(mask_array, sample_list))
     lungs = np.array(lungs)
     masks = np.array(masks)
     return lungs, masks
