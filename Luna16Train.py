@@ -15,7 +15,7 @@ def sample(img_array: np.ndarray, sample_list: list) -> np.ndarray:
     return np.array([img_array[i] for i in range(len(img_array)) if i in sample_list])
 
 
-def load_images(patient_ids: list, directory: str, *, size=128, k=150) -> (np.ndarray, np.ndarray):
+def load_images(patient_ids: list, directory: str, *, size, k) -> (np.ndarray, np.ndarray):
     lungs = []
     masks = []
     for patient_id in tqdm(patient_ids):
@@ -37,10 +37,11 @@ def main(args):
     annotations = pd.read_csv(args.a)
     directory = args.d
     output = args.o
+    k = args.k
     patient_ids = list(set(annotations["seriesuid"]))
     size = 128
 
-    lungs, masks = load_images(patient_ids, directory, size=128)
+    lungs, masks = load_images(patient_ids, directory, size=128, k=k)
 
     print(lungs.shape)
     print(masks.shape)
@@ -56,5 +57,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", type=str, help="image directory")
     parser.add_argument("-a", type=str, help="annotation csv file")
-    parser.add_argument("-o", type=str, help="path to output the checkpoint file")
+    parser.add_argument("-o", type=str, help="path to output the checkpoint file", default="./")
+    parser.add_argument("-k", type=str, help="sampling from each patient", default=150)
     main(parser.parse_args())
