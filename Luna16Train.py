@@ -50,6 +50,9 @@ def main(args):
     print(masks.shape)
     print(output)
 
+    lungs = np.array([lungs]).transpose((1, 2, 3, 0))
+    masks = np.array([masks]).transpose((1, 2, 3, 0))
+
     model = UNet.get_unet(size, size)
     model_checkpoint = ModelCheckpoint('{}/weights.h5'.format(output), monitor='val_loss', save_best_only=True)
     model.fit(lungs, masks, batch_size=32, epochs=20, verbose=1, shuffle=True, validation_split=0.2,
