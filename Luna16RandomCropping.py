@@ -4,6 +4,7 @@ import random
 import traceback
 
 import numpy as np
+import os
 import pandas as pd
 from tqdm import tqdm
 
@@ -12,8 +13,13 @@ np.random.seed(71)
 
 
 def load_numpy_array(patient_id: str, directory: str) -> (np.ndarray, np.ndarray):
-    lung_img = np.load("{}/{}_lung_img.npz".format(directory, patient_id))
-    nodule_mask = np.load("{}/{}_nodule_mask.npz".format(directory, patient_id))
+    lung_filepath = "{}/{}_lung_img.npz".format(directory, patient_id)
+    nodule_filepath = "{}/{}_nodule_mask.npz".format(directory, patient_id)
+    if not os.path.exists(lung_filepath) or not os.path.exists(nodule_filepath):
+        return None
+
+    lung_img = np.load(lung_filepath)
+    nodule_mask = np.load(nodule_filepath)
     return lung_img, nodule_mask
 
 
@@ -62,7 +68,11 @@ def single_task(args) -> None:
     num = 2000
     # noinspection PyBroadException
     try:
-        lung_img, nodule_mask = load_numpy_array(patient_id, directory)
+        loaded_array = load_numpy_array(patient_id, directory)
+        if not loaded_array:
+            return
+
+        lung_img, nodule_mask = loaded_array
         lung_x, nodule_x = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="x")
         lung_y, nodule_y = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="y")
         lung_z, nodule_z = cropped_list(lung_img, nodule_mask, size=size, num=num, axis="z")
