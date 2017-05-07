@@ -62,10 +62,9 @@ def cropped_list(img: np.ndarray, mask: np.ndarray, *, size: int, num: int, axis
 
 
 def single_task(args) -> None:
-    patient_id, directory = args
+    patient_id, directory, num = args
 
     size = 128
-    num = 2000
     # noinspection PyBroadException
     try:
         loaded_array = load_numpy_array(patient_id, directory)
@@ -94,9 +93,10 @@ def main(args) -> None:
 
     annotations = pd.read_csv(args.a)
     directory = args.d
+    num = args.n
 
     patient_ids = list(set(annotations["seriesuid"]))
-    args_list = [(patient_id, directory) for patient_id in patient_ids]
+    args_list = [(patient_id, directory, num) for patient_id in patient_ids]
     progress_bar = tqdm(total=len(args_list))
 
     for _ in pool.imap_unordered(single_task, args_list):
@@ -108,4 +108,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", type=str, help="annotation csv file")
     parser.add_argument("-d", type=str, help="image directory")
+    parser.add_argument("-n", type=str, help="number of crops for each image", default=500)
     main(parser.parse_args())
