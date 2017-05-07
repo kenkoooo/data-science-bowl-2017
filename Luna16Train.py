@@ -2,6 +2,7 @@ import argparse
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 
 def main(args):
@@ -13,7 +14,7 @@ def main(args):
 
     lungs = []
     masks = []
-    for patient_id in patient_ids:
+    for patient_id in tqdm(patient_ids):
         lung_path = "{}/{}_lung_cropped_{}.npz".format(directory, patient_id, size)
         mask_path = "{}/{}_nodule_cropped_{}.npz".format(directory, patient_id, size)
         lungs.append(np.load(lung_path))
