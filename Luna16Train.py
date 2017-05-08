@@ -37,9 +37,15 @@ def main(args):
     annotations = pd.read_csv(args.a)
     directory = args.d
     output = args.o
+
     k = args.k
+    if k > 600:
+        k = 600
+
     patient_ids = list(set(annotations["seriesuid"]))
     size = 128
+
+    random.shuffle(patient_ids)
 
     lungs, masks = load_images(patient_ids, directory, size=128, k=k)
 
@@ -50,10 +56,16 @@ def main(args):
     lungs = np.array([lungs]).transpose((1, 2, 3, 0))
     masks = np.array([masks]).transpose((1, 2, 3, 0))
 
+    train_split = len(patient_ids) * 8 // 10
+    train_split *= k
+
+    lungs_train, masks_train = lungs[:train_split], masks[:train_split]
+    lungs_test, masks_test = lungs[train_split:], masks[train_split:]
+
     model = UNet.get_unet(size, size)
     model_checkpoint = ModelCheckpoint('{}/weights.h5'.format(output), monitor='val_loss', save_best_only=True)
-    model.fit(lungs, masks, batch_size=32, epochs=20, verbose=1, shuffle=True, validation_split=0.2,
-              callbacks=[model_checkpoint])
+    model.fit(lungs_train, masks_train, batch_size=32, epochs=20, verbose=1, shuffle=True,
+              validation_data=(lungs_test, masks_test), callbacks=[model_checkpoint])
 
 
 if __name__ == '__main__':
