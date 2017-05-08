@@ -73,7 +73,7 @@ def main(args):
               shuffle=True,
               validation_data=(lungs_test, masks_test),
               callbacks=[model_checkpoint])
-    model.save_weights("{}/learned_weights.hdf5")
+    model.save_weights("{}/learned_weights.hdf5".format(output))
 
 
 if __name__ == '__main__':
