@@ -38,7 +38,7 @@ def main(args):
     directory = args.d
     output = args.o
 
-    k = args.k
+    k = int(args.k)
     if k > 600:
         k = 600
 
