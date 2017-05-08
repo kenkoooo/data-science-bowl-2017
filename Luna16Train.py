@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 import pandas as pd
-from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.callbacks import ModelCheckpoint
 from tqdm import tqdm
 
 import UNet
@@ -63,11 +63,16 @@ def main(args):
     lungs_test, masks_test = lungs[train_split:], masks[train_split:]
 
     model = UNet.get_unet(size, size)
-    tensor_board_callback = TensorBoard(log_dir=output, histogram_freq=1)
-    model_checkpoint = ModelCheckpoint('{}/weights_checkpoint.hdf5'.format(output), monitor='val_loss',
+    model_checkpoint = ModelCheckpoint('{}/weights_checkpoint.hdf5'.format(output),
+                                       monitor='val_loss',
                                        save_best_only=True)
-    model.fit(lungs_train, masks_train, batch_size=32, epochs=20, verbose=1, shuffle=True,
-              validation_data=(lungs_test, masks_test), callbacks=[model_checkpoint, tensor_board_callback])
+    model.fit(lungs_train, masks_train,
+              batch_size=32,
+              epochs=20,
+              verbose=1,
+              shuffle=True,
+              validation_data=(lungs_test, masks_test),
+              callbacks=[model_checkpoint])
     model.save_weights("{}/learned_weights.hdf5")
 
 
